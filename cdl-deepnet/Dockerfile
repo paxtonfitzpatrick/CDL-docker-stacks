@@ -30,22 +30,24 @@ RUN echo "Building with Python $PYTHON_VERSION" \
            && apt-get clean \
            && rm -rf /var/lib/apt/lists/*; \
        fi \
-    && source /etc/profile.d/pin_conda_package_version.sh \
-    && conda install -Sy --override-channels -c anaconda tensorflow=2.2.0 \
-    && pin_package tensorflow minor equal \
-    && conda install -Sy \
-        pystan=2.19.11 \
-        $CONDA_PACKAGES \
-    && pin_package pystan minor equal \
+    && if [ -n "$CONDA_PACKAGES" ]; then \
+           conda install -y $CONDA_PACKAGES; \
+       fi \
     && if [ -n "$PIP_VERSION" ]; then \
            conda install -Sy pip=$PIP_VERSION \
            && pin_package pip major min; \
        fi \
     && conda clean --all -f -y \
     && pip install \
-        Edward==1.3.5 \
+        tensorflow==2.3.1 \
+        pystan==2.19.1.1 \
+        edward==1.3.5 \
         pyro-ppl==1.4.0 \
         $PIP_PACKAGES \
     && rm -rf ~/.cache/pip \
-    && pin_package Edward exact equal \
-    && pin_package pyro-ppl minor equal
+    && source /etc/profile.d/pin_conda_package_version.sh \
+    && pin_package tensorflow minor equal \
+    && pin_package pystan minor equal \
+    && pin_package edward exact equal \
+    && pin_package pyro-ppl minor equal \
+    && pin_package numpy exact min
